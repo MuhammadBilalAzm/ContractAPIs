@@ -1,0 +1,62 @@
+name: Postman API Tests
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+  workflow_dispatch:
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Create reports directory
+      run: mkdir -p reports
+
+    - name: Update environment variables with secrets
+      run: |
+        # Update the environment file with secrets from GitHub
+        jq '.values |= map(
+          if .key == "baseUrl" then .value = "${{ secrets.BASE_URL }}"
+          elif .key == "X-Contracts-Timestamp" then .value = "${{ secrets.X_CONTRACTS_TIMESTAMP }}"
+          elif .key == "X-Contracts-ClientId" then .value = "${{ secrets.X_CONTRACTS_CLIENTID }}"
+          elif .key == "X-Contracts-APIKey" then .value = "${{ secrets.X_CONTRACTS_APIKEY }}"
+          elif .key == "SecretKey" then .value = "${{ secrets.SECRET_KEY }}"
+          elif .key == "connectionlurl" then .value = "${{ secrets.CONNECTION_URL }}"
+          else .
+          end
+        )' DigitalContracts-dev.postman_environment.json > temp-env.json
+        mv temp-env.json DigitalContracts-dev.postman_environment.json
+
+    - name: Run Postman Collection
+      run: npm test
+      continue-on-error: false
+
+    - name: Upload HTML Report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: postman-test-report
+        path: reports/report.html
+        retention-days: 30
+
+    - name: Test Summary
+      if: always()
+      run: |
+        echo "## API Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Postman tests completed" >> $GITHUB_STEP_SUMMARY
+        echo "📊 HTML report generated and uploaded as artifact" >> $GITHUB_STEP_SUMMARY
