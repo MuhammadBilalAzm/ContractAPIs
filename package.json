@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "Automated Postman API tests for Contract APIs",
   "scripts": {
-    "test": "newman run \"My Collection.postman_collection.json\" -e \"DigitalContracts-dev.postman_environment.json\" -r htmlextra,cli --reporter-htmlextra-export reports/report.html --insecure",
-    "test:local": "newman run \"My Collection.postman_collection.json\" -e \"DigitalContracts-dev.postman_environment.json\" -r cli --insecure"
+    "test": "newman run \"My Collection.postman_collection.json\" -e \"DigitalContracts-dev.postman_environment.json\" -r htmlextra,cli --reporter-htmlextra-export reports/report.html --insecure --delay-request 1000",
+    "test:local": "newman run \"My Collection.postman_collection.json\" -e \"DigitalContracts-dev.postman_environment.json\" -r cli --insecure --delay-request 500",
+    "test:all": "newman run \"My Collection.postman_collection.json\" -e \"DigitalContracts-dev.postman_environment.json\" -r htmlextra,cli --reporter-htmlextra-export reports/report-all.html --insecure"
   },
   "keywords": [
     "postman",
