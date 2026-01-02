@@ -28,19 +28,33 @@ jobs:
       run: mkdir -p reports
 
     - name: Update environment variables with secrets
+      env:
+        BASE_URL: ${{ secrets.BASE_URL }}
+        X_CONTRACTS_TIMESTAMP: ${{ secrets.X_CONTRACTS_TIMESTAMP }}
+        X_CONTRACTS_CLIENTID: ${{ secrets.X_CONTRACTS_CLIENTID }}
+        X_CONTRACTS_APIKEY: ${{ secrets.X_CONTRACTS_APIKEY }}
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        CONNECTION_URL: ${{ secrets.CONNECTION_URL }}
       run: |
         # Update the environment file with secrets from GitHub
-        jq '.values |= map(
-          if .key == "baseUrl" then .value = "${{ secrets.BASE_URL }}"
-          elif .key == "X-Contracts-Timestamp" then .value = "${{ secrets.X_CONTRACTS_TIMESTAMP }}"
-          elif .key == "X-Contracts-ClientId" then .value = "${{ secrets.X_CONTRACTS_CLIENTID }}"
-          elif .key == "X-Contracts-APIKey" then .value = "${{ secrets.X_CONTRACTS_APIKEY }}"
-          elif .key == "SecretKey" then .value = "${{ secrets.SECRET_KEY }}"
-          elif .key == "connectionlurl" then .value = "${{ secrets.CONNECTION_URL }}"
-          else .
-          end
-        )' DigitalContracts-dev.postman_environment.json > temp-env.json
+        jq --arg baseUrl "$BASE_URL" \
+           --arg timestamp "$X_CONTRACTS_TIMESTAMP" \
+           --arg clientId "$X_CONTRACTS_CLIENTID" \
+           --arg apiKey "$X_CONTRACTS_APIKEY" \
+           --arg secretKey "$SECRET_KEY" \
+           --arg connUrl "$CONNECTION_URL" \
+           '.values |= map(
+             if .key == "baseUrl" then .value = $baseUrl
+             elif .key == "X-Contracts-Timestamp" then .value = $timestamp
+             elif .key == "X-Contracts-ClientId" then .value = $clientId
+             elif .key == "X-Contracts-APIKey" then .value = $apiKey
+             elif .key == "SecretKey" then .value = $secretKey
+             elif .key == "connectionlurl" then .value = $connUrl
+             else .
+             end
+           )' DigitalContracts-dev.postman_environment.json > temp-env.json
         mv temp-env.json DigitalContracts-dev.postman_environment.json
+        cat DigitalContracts-dev.postman_environment.json
 
     - name: Run Postman Collection
       run: npm test
