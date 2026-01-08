@@ -30,24 +30,39 @@ cd ContractAPIs
 npm install
 ```
 
-### 3. Configure GitHub Secrets
+### 3. Configure Environment & Credentials
 
-Go to your GitHub repository settings and add the following secrets:
+#### Local Development
+
+Update credentials in **`DigitalContracts-dev.postman_environment.json`**:
+
+- **Lines 18-22**: `X-Contracts-ClientId` - Your dev environment client ID
+- **Lines 24-28**: `X-Contracts-APIKey` - Your dev environment API key  
+- **Lines 30-34**: `SecretKey` - Your dev environment secret key
+
+**Important URLs** (already configured):
+- **baseUrl**: `https://api-dev.contracts.com.sa` (Line 7)
+- **connectionlurl**: `api-dev.contracts.com.sa` (Line 47)
+
+📖 See [CREDENTIALS.md](CREDENTIALS.md) for detailed instructions on updating credentials.
+
+#### GitHub CI/CD
+
+Configure the `POSTMAN_ENVIRONMENT` secret:
 
 **Path:** `Settings > Secrets and variables > Actions > New repository secret`
 
-Add these secrets:
+| Secret Name | Description | Value |
+|------------|-------------|-------|
+| `POSTMAN_ENVIRONMENT` | Complete environment JSON | Entire content of `DigitalContracts-dev.postman_environment.json` |
 
-| Secret Name | Description | Example Value |
-|------------|-------------|---------------|
-| `BASE_URL` | API Base URL | `https://proxyqa.contracts.sa` |
-| `X_CONTRACTS_TIMESTAMP` | Contracts Timestamp | `1666865757` |
-| `X_CONTRACTS_CLIENTID` | Client ID | Your encrypted client ID |
-| `X_CONTRACTS_APIKEY` | API Key | Your encrypted API key |
-| `SECRET_KEY` | Secret Key for signing | Your encrypted secret key |
-| `CONNECTION_URL` | Connection URL | `api-sandbox.contracts.sa` |
+**To update:**
+1. Go to: https://github.com/MuhammadBilalAzm/ContractAPIs/settings/secrets/actions
+2. Click `POSTMAN_ENVIRONMENT` → "Update secret"
+3. Paste the complete updated JSON from your environment file
+4. Click "Update secret"
 
-> ⚠️ **Important:** Never commit these values to your repository!
+> ⚠️ **Important:** Never commit sensitive credentials to your repository!
 
 ### 4. Run Tests Locally
 
